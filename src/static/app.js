@@ -502,18 +502,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const subject = `Check out this activity: ${activityName}`;
     const body = `I thought you might be interested in this activity at Mergington High School:\n\n${activityName}\n${description}\n\nSchedule: ${schedule}\n\nLearn more: ${url}`;
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
+    
+    // Use anchor element to avoid interfering with page history
+    const link = document.createElement('a');
+    link.href = mailtoUrl;
+    link.click();
   }
 
   // Function to copy link to clipboard
   function copyLinkToClipboard(activityName) {
     const url = generateShareUrl(activityName);
-    navigator.clipboard.writeText(url).then(() => {
-      showMessage('Link copied to clipboard!', 'success');
-    }).catch(err => {
-      console.error('Failed to copy link:', err);
-      showMessage('Failed to copy link', 'error');
-    });
+    
+    // Check if clipboard API is available
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showMessage('Link copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy link:', err);
+        showMessage('Failed to copy link', 'error');
+      });
+    } else {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        showMessage('Link copied to clipboard!', 'success');
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showMessage('Failed to copy link', 'error');
+      }
+      
+      document.body.removeChild(textArea);
+    }
   }
 
   // Function to render a single activity card
