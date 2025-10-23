@@ -506,7 +506,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Use anchor element to avoid interfering with page history
     const link = document.createElement('a');
     link.href = mailtoUrl;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   }
 
   // Function to copy link to clipboard
@@ -526,7 +528,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const textArea = document.createElement('textarea');
       textArea.value = url;
       textArea.style.position = 'fixed';
+      textArea.style.top = '-999999px';
       textArea.style.left = '-999999px';
+      textArea.style.opacity = '0';
+      textArea.style.pointerEvents = 'none';
       document.body.appendChild(textArea);
       textArea.select();
       
